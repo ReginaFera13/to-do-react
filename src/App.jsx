@@ -1,73 +1,91 @@
-import React, { useState } from "react";
-import taskData from './data/tasks.json'
-import "./App.css";
+import { useState } from 'react'
+import './App.css'
+import tasksData from './data/tasks.json';
+import Task from './Task';
+
+// Get tasks data from json
+
+// Show the list of tasks
+
+// An input and form so a user can create and add a new task, which we then
+// see in the list
 
 function App() {
-  const [tasks, setTasks] = useState(taskData);
-  const listName = "To Do List";
-  
-  const addTask  = (event) => {
+  const [tasks, setTasks] = useState(tasksData);
+  const [newTaskInput, setNewTaskInput] = useState("");
+  let lastEntry = tasks.length-1
+
+  const addTaskHandler =(event) => {
     event.preventDefault();
-    let userInput = document.getElementById("userInput");
-    let newTask = {}
-    setTasks([...tasks, newTask])
+    const newTask = { id: tasks[lastEntry].id + 1, description: newTaskInput, completed: false };
+    setTasks([ ...tasks, newTask]);
+    setNewTaskInput('')
+  };
+
+  const handleNewTaskInput = (event) => {
+    event.preventDefault();
+    setNewTaskInput(event.target.value);
   }
 
-  const renderTask = (task) => {
-    return <p id='task' onClick={completeTask}>ID: {task.id}, {task.description}, COMPLETED: {task.completed ? "Yes" : "No"}</p>;
+  const handleDeleteTask = (taskToDeleteID) => {
+    const updatedTasks = tasks.filter(task => {
+      if(task.id === taskToDeleteID) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    setTasks(updatedTasks);
   }
 
-  const completeTask = (event) => {
-    event.target.style.textDecoration = 'line-through'
+  const handleCompleteTask = (taskID, taskCompleted) => {
+    if (taskCompleted) {
+      const updatedTasks = tasks.map(task => {
+        const newCompleted = (taskID === task.id) ? false : task.completed;
+        return { 
+          id: task.id,
+          description: task.description,
+          completed: newCompleted,
+        }
+      });
+      setTasks(updatedTasks)
+    } else {
+      const updatedTasks = tasks.map(task => {
+        const newCompleted = (taskID === task.id) ? true : task.completed;
+        return { 
+          id: task.id,
+          description: task.description,
+          completed: newCompleted,
+        }
+      });
+      setTasks(updatedTasks)
+    }
   }
-
-  const deleteTask = (event) => {
-    event.target.parentNode.remove();
-  }
-  // const addTask = (e) => {
-  //   e.preventDefault();
-  //   let userInput = document.getElementById("userInput");
-  //   let result = document.getElementById("result");
-  //   let taskContainer = document.getElementById("taskContainer");
-  //   let resultMessage = document.getElementById("resultMessage");
-  //   let li = document.createElement('li');
-  //   let button = document.createElement('button')
-  //   button.innerText = 'x'
-  //   button.id = 'delete'
-  //   button.addEventListener('click', (event) => {
-  //     event.target.parentNode.remove();
-  //   })
-  //   let p = document.createElement('p')
-  //   p.innerText = userInput.value
-  //   p.id = 'task'
-  //   p.addEventListener('click', (event) => {
-  //     event.target.style.textDecoration = 'line-through'
-  //   })
-  //   li.appendChild(p)
-  //   li.appendChild(button)
-  //   taskContainer.appendChild(li);
-  //   userInput.value = '';
-  // };
 
   return (
     <>
-      <h1>{listName}</h1>
-      {/* 
-      if you are passing an argument to a function you 
-      must do it through an arrow function 
-      */}
-      <form onSubmit={(e) => addTask(e)}>
-        <input type="text" id="userInput" />
-        <button type="submit">Submit</button>
+      <h1>To-Do:</h1>
+      <form>
+        <input placeholder={"Enter task description"} onChange={handleNewTaskInput} value={newTaskInput}></input>
+        <button onClick={addTaskHandler}>Add Task</button>
       </form>
-      <div id="result">
-        <h3 id='resultMessage'>Add a Task</h3>
-        <ul id='taskContainer'>
-          {tasks.map((task, i) => <li key={i}>{renderTask(task)}<button id="delete" onClick={deleteTask}>x</button></li>)}
-        </ul>
-      </div>
+      
+      <ul>
+        {tasks.map((task, i) => 
+          <Task 
+            id={task.id}
+            description={task.description}
+            completed={task.completed}
+            key={i} 
+            handleDeleteTask={handleDeleteTask}
+            handleCompleteTask={handleCompleteTask}
+          />
+        )}
+      </ul>
+      
     </>
-  );
+  )
 }
 
-export default App;
+export default App

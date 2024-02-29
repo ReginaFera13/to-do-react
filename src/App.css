@@ -38,7 +38,7 @@ ul {
 li {
   display: flex;
   justify-content: space-between;
-  width: 500px;
+  width: 300px;
   height: fit-content;
 }
 
@@ -50,4 +50,13 @@ li {
 
 p {
   margin: 5px;
+}
+
+.completedtask {
+  text-decoration: line-through;
+  color: grey;
+}
+
+.incompletetask {
+  color: red;
 }
